@@ -1,8 +1,11 @@
+require("@nomiclabs/hardhat-etherscan");
+const { ethers } = require("hardhat");
+
 async function main() {
   const AlphaCarpFactory = await ethers.getContractFactory("AlphaCarp");
   console.log("Deploying AlphaCarp...");
 
-  const AlphaCarp = await AlphaCarpFactory.deploy();
+  const AlphaCarp = await AlphaCarpFactory.deploy(process.env.DEPLOYER_ADDRESS);
 
   console.log("Alpha Carp has been deployed to :: ", AlphaCarp.address);
 }

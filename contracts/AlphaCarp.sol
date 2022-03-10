@@ -10,12 +10,56 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
+contract MultiOwnable {
+    address public manager; // address used to set owners
+    address[] public owners;
+    mapping(address => bool) public ownerByAddress;
+
+    event SetOwners(address[] owners);
+
+    modifier onlyOwner() {
+        require(ownerByAddress[msg.sender] == true);
+        _;
+    }
+
+    /**
+     * @dev MultiOwnable constructor sets the manager
+     */
+    constructor(address _manager) {
+        manager = _manager;
+    }
+
+    /**
+     * @dev Function to set owners addresses
+     */
+    function setOwners(address[] memory _owners) public {
+        require(msg.sender == manager);
+        _setOwners(_owners);
+    }
+
+    function _setOwners(address[] memory _owners) internal {
+        for (uint256 i = 0; i < owners.length; i++) {
+            ownerByAddress[owners[i]] = false;
+        }
+
+        for (uint256 j = 0; j < _owners.length; j++) {
+            ownerByAddress[_owners[j]] = true;
+        }
+        owners = _owners;
+        emit SetOwners(_owners);
+    }
+
+    function getOwners() public view returns (address[] memory) {
+        return owners;
+    }
+}
+
 contract AlphaCarp is
     ERC721,
     ERC721Enumerable,
     ERC721URIStorage,
     Pausable,
-    Ownable
+    MultiOwnable
 {
     using SafeMath for uint256;
     using Strings for uint256;
@@ -87,7 +131,10 @@ contract AlphaCarp is
         _;
     }
 
-    constructor() ERC721("Alpha Carp Test", "KOTEST") {}
+    constructor(address _manager)
+        ERC721("Alpha Carp Test", "KOTEST")
+        MultiOwnable(_manager)
+    {}
 
     function pause() public onlyOwner {
         _pause();
