@@ -4,9 +4,8 @@ require("@nomiclabs/hardhat-etherscan");
 require("@nomiclabs/hardhat-waffle");
 require("hardhat-gas-reporter");
 require("solidity-coverage");
-
-require('@nomiclabs/hardhat-ethers');
-require('@openzeppelin/hardhat-upgrades');
+require("@nomiclabs/hardhat-ethers");
+require("@openzeppelin/hardhat-upgrades");
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -30,13 +29,15 @@ module.exports = {
   networks: {
     ropsten: {
       url: process.env.ROPSTEN_URL || "",
-      accounts:
-        privatKey !== undefined ? [privatKey] : [],
+      accounts: privatKey !== undefined ? [privatKey] : [],
     },
     rinkeby: {
       url: process.env.RINKEBY_URL || "",
-      accounts:
-        privatKey !== undefined ? [privatKey] : [],
+      accounts: privatKey !== undefined ? [privatKey] : [],
+    },
+    mumbai: {
+      url: process.env.MUMBAI_URL || "",
+      accounts: privatKey !== undefined ? [privatKey] : [],
     },
   },
   gasReporter: {
