@@ -4,6 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "deploy:mumbai": "yarn hardhat run scripts/deploy.js --network mumbai",
+    "deploy:ropsten": "yarn hardhat run scripts/deploy.js --network ropsten",
+    "deploy:rinkeby": "yarn hardhat run scripts/deploy.js --network rinkeby",
+    "verify:mumbai": "yarn hardhat verify --network mumbai",
+    "verify:ropsten": "yarn hardhat verify --network ropsten",
+    "verify:rinkeby": "yarn hardhat verify --network rinkeby",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
