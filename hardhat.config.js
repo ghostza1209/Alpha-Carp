@@ -38,12 +38,17 @@ module.exports = {
       accounts:
         privatKey !== undefined ? [privatKey] : [],
     },
+    mumbai: {
+      url: process.env.MUMBAI_URL || "",
+      accounts:
+        privatKey !== undefined ? [privatKey] : [],
+    }
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
     currency: "USD",
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
+    apiKey: process.env.POLYGON_SCAN_API_KEY,
   },
 };

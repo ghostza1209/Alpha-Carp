@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
 contract AlphaCarp is
     ERC721,
@@ -26,7 +27,10 @@ contract AlphaCarp is
     uint256 public constant MAX_PURCHASE_AT_A_TIME = 10;
     uint256 public constant MAX_CARPES = 5000;
 
-    bool public isSaleActive = true;
+    bool public isSaleActive = false;
+
+    bytes32 public whitelistMerkleRoot;
+    uint256 public whiteListCost;
 
     /**
     -------------------------------------------------------------------------------
@@ -60,6 +64,26 @@ contract AlphaCarp is
 
     modifier onlySaleIsActive() {
         require(isSaleActive, "Sale must be active to mint Carp");
+        _;
+    }
+
+    modifier isValidMerkleProof(bytes32[] calldata merkleProof, bytes32 root) {
+        require(
+            MerkleProof.verify(
+                merkleProof,
+                root,
+                keccak256(abi.encodePacked(msg.sender))
+            ),
+            "Address does not exist in list"
+        );
+        _;
+    }
+
+    modifier isCorrectPayment(uint256 _price, uint256 _numberOfTokens) {
+        require(
+            _price * _numberOfTokens == msg.value,
+            "Incorrect ETH value sent"
+        );
         _;
     }
 
@@ -174,5 +198,28 @@ contract AlphaCarp is
                 _safeMint(msg.sender, mintIndex);
             }
         }
+    }
+
+    function setIsSaleActive(bool _isSaleActive) public onlyOwner {
+        isSaleActive = _isSaleActive;
+    }
+
+    function setWhitelistCost(uint256 _newCost) public onlyOwner {
+        whiteListCost = _newCost;
+    }
+
+    function mintWhitelist(bytes32[] calldata merkleProof)
+        public
+        payable
+        isValidMerkleProof(merkleProof, whitelistMerkleRoot)
+        isCorrectPayment(whiteListCost, 1)
+    {
+        uint256 supply = totalSupply();
+        require(supply + 1 <= MAX_CARPES, "max NFT limit exceeded");
+        _safeMint(msg.sender, supply + 1);
+    }
+
+    function setWhitelistMerkleRoot(bytes32 merkleRoot) external onlyOwner {
+        whitelistMerkleRoot = merkleRoot;
     }
 }
